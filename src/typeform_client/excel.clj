@@ -34,11 +34,15 @@
         title-repeat (repeat-non-empty title)]
     {:title title :rows (map #(title-row title-repeat %) rows)}))
 
+(defn row-group [row [title :as title-group]]
+  (let [row (map #(or % "") row)]
+    (take (count title-group) (concat (row title) (repeat "")))))
+
 (defn spit-sheet [f {:keys [title rows]}]
-  (let [ks (filter not-empty title)]
+  (let [title-groups (->> title repeat-non-empty (group-by identity))]
     (->>
       (for [row rows]
-        (mapcat row ks))
+        (mapcat #(row-group row %) title-groups))
       (cons title)
       (xls/create-workbook "Contacts")
       (xls/save-workbook! f))))
