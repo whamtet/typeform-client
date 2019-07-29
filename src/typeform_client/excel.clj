@@ -35,14 +35,21 @@
     {:title title :rows (map #(title-row title-repeat %) rows)}))
 
 (defn row-group [row [title :as title-group]]
-  (let [row (map #(or % "") row)]
-    (take (count title-group) (concat (row title) (repeat "")))))
+  (let [row (map #(or % "") (row title))]
+    (take (count title-group) (concat row (repeat "")))))
 
 (defn spit-sheet [f {:keys [title rows]}]
-  (let [title-groups (->> title repeat-non-empty (group-by identity))]
+  (let [title-groups (->> title repeat-non-empty (partition-by identity))]
     (->>
       (for [row rows]
         (mapcat #(row-group row %) title-groups))
       (cons title)
       (xls/create-workbook "Contacts")
       (xls/save-workbook! f))))
+
+(defn mod-sheet [f1 func f2]
+  (spit-sheet
+    f2
+    (-> f1
+        parse-sheet
+        (update :rows func))))

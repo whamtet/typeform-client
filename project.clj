@@ -13,4 +13,8 @@
                  [com.sun.xml.bind/jaxb-core "2.2.11"]
                  [com.sun.xml.bind/jaxb-impl "2.2.11"]
                  [javax.activation/activation "1.1.1"]]
+  :main typeform-client.core
+  :profiles
+  {:uberjar {:omit-source false
+             :aot :all}}
   :repl-options {:init-ns typeform-client.core})
